@@ -25,15 +25,7 @@ public class SignController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/sign-up/user")
     public Response userSignup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
-        signService.userSignup(signupRequestDto);
-        return Response.success();
-    }
-
-    @ApiOperation(value = "가이드 회원가입", notes = "가이드 회원가입 진행")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/sign-up/guide")
-    public Response guideSignup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
-        signService.guideSignup(signupRequestDto);
+        signService.signUp(signupRequestDto);
         return Response.success();
     }
 

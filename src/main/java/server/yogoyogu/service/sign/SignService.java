@@ -31,7 +31,7 @@ public class SignService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public void userSignup(SignupRequestDto req) {
+    public void signUp(SignupRequestDto req) {
         validateSignUpInfo(req);
 
         Member member = Member.builder()
@@ -43,24 +43,6 @@ public class SignService {
                 .phone(req.getPhone())
                 .address(req.getAddress())
                 .authority(Authority.ROLE_USER)
-                .build();
-
-        memberRepository.save(member);
-    }
-
-    @Transactional
-    public void guideSignup(SignupRequestDto req) {
-        validateSignUpInfo(req);
-
-        Member member = Member.builder()
-                .username(req.getUsername())
-                .password(passwordEncoder.encode(req.getPassword()))
-                .email(req.getEmail())
-                .name(req.getName())
-                .nickname(req.getNickname())
-                .phone(req.getPhone())
-                .address(req.getAddress())
-                .authority(Authority.ROLE_GUIDE)
                 .build();
 
         memberRepository.save(member);
