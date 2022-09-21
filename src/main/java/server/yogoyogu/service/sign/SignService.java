@@ -32,7 +32,16 @@ public class SignService {
 
     @Transactional
     public void signUp(SignupRequestDto req) {
+
         validateSignUpInfo(req);
+
+        Authority authority;
+        if(req.getAuthorityRadio() == 0) {
+            authority = Authority.ROLE_USER;
+        } else {
+            // 학생회
+            authority = Authority.ROLE_MANAGER;
+        }
 
         Member member = Member.builder()
                 .username(req.getUsername())
@@ -40,9 +49,7 @@ public class SignService {
                 .email(req.getEmail())
                 .name(req.getName())
                 .nickname(req.getNickname())
-                .phone(req.getPhone())
-                .address(req.getAddress())
-                .authority(Authority.ROLE_USER)
+                .authority(authority)
                 .build();
 
         memberRepository.save(member);
@@ -50,6 +57,7 @@ public class SignService {
 
     @Transactional
     public TokenResponseDto signIn(LoginRequestDto req) {
+        validateUsername(req);
         Member member = memberRepository.findByUsername(req.getUsername()).orElseThrow(LoginFailureException::new);
         validatePassword(req, member);
 
@@ -100,14 +108,17 @@ public class SignService {
         if (memberRepository.existsByEmail(req.getEmail())) {
             throw new MemberEmailAlreadyExistsException(req.getEmail());
         }
-        if (memberRepository.existsByPhone(req.getPhone())) {
-            throw new MemberPhoneAlreadyExistsException(req.getPhone());
+    }
+
+    private void validateUsername(LoginRequestDto req) {
+        if(!memberRepository.findByUsername(req.getUsername()).isPresent()) {
+            throw new UsernameNotFoundException();
         }
     }
 
     private void validatePassword(LoginRequestDto loginRequestDto, Member member) {
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())) {
-            throw new LoginFailureException();
+            throw new PasswordNotFoundException();
         }
     }
 }

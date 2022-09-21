@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @ApiModel(value = "회원가입 요청")
 @Data
@@ -41,15 +38,17 @@ public class SignupRequestDto {
     @NotBlank(message = "이메일을 입력해주세요.")
     private String email;
 
-    @ApiModelProperty(value = "전화번호", notes = "전화번호를 입력해주세요.", required = true, example = "01x-xxxx-xxxx")
-    @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$",message = "핸드폰 번호의 양식과 맞지 않습니다. 01x-xxxx-xxxx")
-    @NotBlank(message = "전화번호를 입력해주세요.")
-    private String phone;
+    @ApiModelProperty(value = "이메일", notes = "이메일을 입력해주세요", required = true, example = "member@email.com")
+    @NotNull(message = "0 == 일반학생 / 1 == 학생회")
+    private int authorityRadio;
 
-    @ApiModelProperty(value = "주소", notes = "주소를 입력해주세요.", required = true, example = "경기도 용인시 ~")
-    @NotBlank(message = "주소를 입력해주세요.")
-    private String address;
+//    @ApiModelProperty(value = "전화번호", notes = "전화번호를 입력해주세요.", required = true, example = "01x-xxxx-xxxx")
+//    @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$",message = "핸드폰 번호의 양식과 맞지 않습니다. 01x-xxxx-xxxx")
+//    @NotBlank(message = "전화번호를 입력해주세요.")
+//    private String phone;
 
-
+//    @ApiModelProperty(value = "주소", notes = "주소를 입력해주세요.", required = true, example = "경기도 용인시 ~")
+//    @NotBlank(message = "주소를 입력해주세요.")
+//    private String address;
 
 }

@@ -23,7 +23,7 @@ public class SignController {
 
     @ApiOperation(value = "유저 회원가입", notes = "유저 회원가입 진행")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/sign-up/user")
+    @PostMapping("/sign-up")
     public Response userSignup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
         signService.signUp(signupRequestDto);
         return Response.success();
