@@ -15,6 +15,7 @@ import server.yogoyogu.controller.sign.SignController;
 import server.yogoyogu.dto.sign.LoginRequestDto;
 import server.yogoyogu.dto.sign.SignupRequestDto;
 import server.yogoyogu.dto.sign.TokenResponseDto;
+import server.yogoyogu.service.email.EmailService;
 import server.yogoyogu.service.sign.SignService;
 
 import static org.mockito.BDDMockito.given;
@@ -31,6 +32,9 @@ public class SignControllerUnitTest {
     @Mock
     SignService signService;
 
+    @Mock
+    EmailService emailService;
+
     MockMvc mockMvc;
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -43,7 +47,7 @@ public class SignControllerUnitTest {
     @DisplayName("유저 회원가입")
     void userSignupTest() throws Exception {
         // given
-        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", 0);
+        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", 0, "d123");
 
         // when
         mockMvc.perform(
@@ -60,7 +64,7 @@ public class SignControllerUnitTest {
     @DisplayName("학생회 회원가입")
     void managerSignupTest() throws Exception {
         // given
-        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", 1);
+        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", 1, "d123");
 
         // when
         mockMvc.perform(
@@ -90,5 +94,37 @@ public class SignControllerUnitTest {
                 .andExpect(jsonPath("$.result.data.refreshToken").value("refresh"));
 
         verify(signService).signIn(req);
+    }
+
+    @Test
+    @DisplayName("유저 회원가입시 이메일 인증")
+    void mailConfirmTest() throws Exception {
+        // given
+        String email = "ss@naver.com";
+
+        // when
+        mockMvc.perform(
+                post("/api/sign-up/email")
+                        .param("email", email)
+        ).andExpect(status().isOk());
+
+        // then
+        verify(emailService).sendSimpleMessage(email);
+    }
+
+    @Test
+    @DisplayName("메일 인증번호 확인")
+    void mailConfirmCheckTest() throws Exception {
+        // given
+        String code = "1234";
+
+        // when
+        mockMvc.perform(
+                post("/api/sign-up/email/check")
+                        .param("code", code)
+        ).andExpect(status().isOk());
+
+        // then
+        verify(signService).confirmMailCode(code);
     }
 }

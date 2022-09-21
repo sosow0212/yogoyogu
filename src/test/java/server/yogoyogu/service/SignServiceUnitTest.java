@@ -9,14 +9,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import server.yogoyogu.dto.sign.LoginRequestDto;
 import server.yogoyogu.dto.sign.SignupRequestDto;
+import server.yogoyogu.entity.member.EmailAuth;
 import server.yogoyogu.exception.LoginFailureException;
 import server.yogoyogu.exception.PasswordNotFoundException;
 import server.yogoyogu.exception.UsernameNotFoundException;
+import server.yogoyogu.repository.Member.EmailAuthRepository;
 import server.yogoyogu.repository.Member.MemberRepository;
 import server.yogoyogu.service.sign.SignService;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,11 +39,16 @@ public class SignServiceUnitTest {
     @Mock
     PasswordEncoder passwordEncoder;
 
+    @Mock
+    EmailAuthRepository emailAuthRepository;
+
     @Test
     @DisplayName("유저 회원가입 서비스")
     void userSignupTest() {
         // given
-        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", 0);
+        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", 0, "mailAuth");
+        EmailAuth emailAuth = new EmailAuth("mailAuth", "dd@naver.com");
+        given(emailAuthRepository.findEmailAuthByEmail(req.getEmail())).willReturn(Optional.of(emailAuth));
 
         // when
         signService.signUp(req);
@@ -48,6 +56,21 @@ public class SignServiceUnitTest {
         // then
         verify(passwordEncoder).encode(req.getPassword());
         verify(memberRepository).save(any());
+    }
+
+    @Test
+    @DisplayName("메일 인증 확인 테스트")
+    void mailConfirmTest() {
+        // given
+        String code = "1234";
+        EmailAuth emailAuth = new EmailAuth(code, "sosow0212@naver.com");
+        given(emailAuthRepository.existsByKey(code)).willReturn(true);
+
+        // when
+        boolean result = signService.confirmMailCode(code);
+
+        // then
+        assertThat(result).isEqualTo(true);
     }
 
 
