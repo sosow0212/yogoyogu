@@ -12,7 +12,7 @@ import server.yogoyogu.entity.likes.Likes;
 import server.yogoyogu.entity.member.Authority;
 import server.yogoyogu.entity.member.Member;
 import server.yogoyogu.exception.BoardNotFoundException;
-import server.yogoyogu.exception.BoardOnlyWriteStudent;
+import server.yogoyogu.exception.BoardOnlyWriteStudentException;
 import server.yogoyogu.exception.MemberNotEqualsException;
 import server.yogoyogu.repository.board.BoardRepository;
 import server.yogoyogu.repository.likes.LikesRepository;
@@ -85,7 +85,7 @@ public class BoardService {
 
     public void validateAuthority(Member member) {
         if (member.getAuthority().equals(Authority.ROLE_MANAGER)) {
-            throw new BoardOnlyWriteStudent();
+            throw new BoardOnlyWriteStudentException();
         }
     }
 

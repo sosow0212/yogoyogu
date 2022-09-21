@@ -57,6 +57,21 @@ public class ExceptionAdvice {
         return Response.failure(400, e.getBindingResult().getFieldError().getDefaultMessage());
     }
 
+    // 401 응답
+    // 아이디를 찾을 수 없음
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Response usernameNotFoundException() {
+        return Response.failure(401, "존재하지 않는 아이디입니다.");
+    }
+
+    // 401 응답
+    // 비밀번호를 찾을 수 없음
+    @ExceptionHandler(PasswordNotFoundException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Response passwordNotFoundException() {
+        return Response.failure(401, "존재하지 않는 비밀번호입니다.");
+    }
 
     // 401 응답
     // 아이디 혹은 비밀번호 오류시
@@ -74,6 +89,14 @@ public class ExceptionAdvice {
         return Response.failure(401, "유저 정보가 일치하지 않습니다.");
     }
 
+    // 401 응답
+    // 게시글은 학생만 작성 가능
+    @ExceptionHandler(BoardOnlyWriteStudentException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Response boardOnlyWriteStudent() {
+        return Response.failure(401, "학생회는 건의 게시판에 글을 작성할 수 없습니다.");
+    }
+
     // 404 응답
     // 요청한 User를 찾을 수 없음
     @ExceptionHandler(MemberNotFoundException.class)
@@ -89,6 +112,14 @@ public class ExceptionAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Response roleNotFoundException() {
         return Response.failure(404, "요청한 권한 등급을 찾을 수 없습니다.");
+    }
+
+    // 404 응답
+    // 요청한 게시글을 찾을 수 없음
+    @ExceptionHandler(BoardNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response boardNotFoundException() {
+        return Response.failure(404, "요청한 게시글을 찾을 수 없습니다.");
     }
 
 
