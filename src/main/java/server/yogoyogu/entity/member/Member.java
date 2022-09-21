@@ -33,6 +33,12 @@ public class Member extends EntityDate {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
+    @Column(nullable = false)
+    private boolean isRegistered;
+
+    @Column(nullable = false)
+    private boolean isEmailPassed;
+
     @Builder
     public Member(String username, String password, String name, String nickname, String email, Authority authority) {
         this.username = username;
@@ -41,6 +47,24 @@ public class Member extends EntityDate {
         this.nickname = nickname;
         this.email = email;
         this.authority = authority;
+        this.isRegistered = false;
+        this.isEmailPassed = false;
+    }
+
+    public void registerSuccess() {
+        this.isRegistered = true;
+    }
+
+    public void registerFailed() {
+        this.isRegistered = false;
+    }
+
+    public void emailPassed() {
+        this.isEmailPassed = true;
+    }
+
+    public void emailUnPassed() {
+        this.isEmailPassed = false;
     }
     
 }

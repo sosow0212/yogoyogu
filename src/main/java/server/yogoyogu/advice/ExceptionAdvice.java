@@ -90,6 +90,14 @@ public class ExceptionAdvice {
     }
 
     // 401 응답
+    // 유저 정보가 일치하지 않음
+    @ExceptionHandler(EmailAuthNotEqualsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Response emailAuthNotEqualsException() {
+        return Response.failure(401, "메일 인증 정보가 일치하지 않습니다.");
+    }
+
+    // 401 응답
     // 게시글은 학생만 작성 가능
     @ExceptionHandler(BoardOnlyWriteStudentException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -122,6 +130,13 @@ public class ExceptionAdvice {
         return Response.failure(404, "요청한 게시글을 찾을 수 없습니다.");
     }
 
+    // 404 응답
+    // EmailAuth 찾을 수 없음
+    @ExceptionHandler(EmailAuthDosentExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response emailAuthDosentExistException() {
+        return Response.failure(404, "이메일 인증 키를 찾을 수 없습니다.");
+    }
 
     // 409 응답
     // username 중복

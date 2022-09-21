@@ -42,6 +42,10 @@ public class SignupRequestDto {
     @NotNull(message = "0 == 일반학생 / 1 == 학생회")
     private int authorityRadio;
 
+    @ApiModelProperty(value = "이메일 인증 코드", notes = "이메일 인증코드를 입력해주세요", required = true, example = "4I92QKzA")
+    @NotBlank(message = "유효한 이메일 인증 코드를 입력해주세요.")
+    private String emailAuthKey;
+
 //    @ApiModelProperty(value = "전화번호", notes = "전화번호를 입력해주세요.", required = true, example = "01x-xxxx-xxxx")
 //    @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$",message = "핸드폰 번호의 양식과 맞지 않습니다. 01x-xxxx-xxxx")
 //    @NotBlank(message = "전화번호를 입력해주세요.")

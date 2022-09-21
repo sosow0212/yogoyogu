@@ -14,11 +14,14 @@ import server.yogoyogu.dto.sign.SignupRequestDto;
 import server.yogoyogu.dto.sign.TokenResponseDto;
 import server.yogoyogu.dto.token.TokenDto;
 import server.yogoyogu.entity.member.Authority;
+import server.yogoyogu.entity.member.EmailAuth;
 import server.yogoyogu.entity.member.Member;
 import server.yogoyogu.entity.member.RefreshToken;
 import server.yogoyogu.exception.*;
+import server.yogoyogu.repository.Member.EmailAuthRepository;
 import server.yogoyogu.repository.Member.MemberRepository;
 import server.yogoyogu.repository.Member.RefreshTokenRepository;
+import server.yogoyogu.service.email.EmailService;
 
 @RequiredArgsConstructor
 @Service
@@ -29,14 +32,22 @@ public class SignService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final EmailAuthRepository emailAuthRepository;
 
+
+    /**
+     * 회원가입 순서
+     * 1. email 기반 인증번호 입력
+     * 2. email + 인증번호를 EmailAuth 테이블에 저장
+     * 3. signUp 메서드에서 회원가입시 EmailAuth 가져와서 비교
+     */
     @Transactional
     public void signUp(SignupRequestDto req) {
 
         validateSignUpInfo(req);
 
         Authority authority;
-        if(req.getAuthorityRadio() == 0) {
+        if (req.getAuthorityRadio() == 0) {
             authority = Authority.ROLE_USER;
         } else {
             // 학생회
@@ -52,7 +63,24 @@ public class SignService {
                 .authority(authority)
                 .build();
 
-        memberRepository.save(member);
+        EmailAuth emailAuth = emailAuthRepository.findEmailAuthByEmail(req.getEmail()).orElseThrow(EmailAuthDosentExistException::new);
+        if (emailAuth.getKey().equals(req.getEmailAuthKey())) {
+            member.emailPassed();
+            memberRepository.save(member);
+            emailAuthRepository.delete(emailAuth);
+        } else {
+            member.emailUnPassed();
+            throw new EmailAuthNotEqualsException();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public boolean confirmMailCode(String code) {
+        if(emailAuthRepository.existsByKey(code)) {
+            return true;
+        } else {
+            throw new EmailAuthNotEqualsException();
+        }
     }
 
     @Transactional
@@ -111,7 +139,7 @@ public class SignService {
     }
 
     private void validateUsername(LoginRequestDto req) {
-        if(!memberRepository.findByUsername(req.getUsername()).isPresent()) {
+        if (!memberRepository.findByUsername(req.getUsername()).isPresent()) {
             throw new UsernameNotFoundException();
         }
     }
