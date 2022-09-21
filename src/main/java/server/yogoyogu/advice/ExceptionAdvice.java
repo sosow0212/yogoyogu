@@ -58,6 +58,14 @@ public class ExceptionAdvice {
     }
 
     // 401 응답
+    // 토큰 자격증명 제공X
+    @ExceptionHandler(TokenNotInvalidException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Response tokenNotInvalidException() {
+        return Response.failure(401, "토큰의 자격 증명이 유효하지 않습니다.");
+    }
+
+    // 401 응답
     // 아이디를 찾을 수 없음
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
