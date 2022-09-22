@@ -6,9 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import server.yogoyogu.dto.board.BoardCreateRequestDto;
 import server.yogoyogu.dto.board.BoardEditRequestDto;
-import server.yogoyogu.dto.board.BoardFindAllResponseDto;
 import server.yogoyogu.dto.board.BoardResponseDto;
 import server.yogoyogu.dto.reply.ReplyCreateRequestDto;
 import server.yogoyogu.dto.reply.ReplyEditRequestDto;
@@ -22,7 +23,6 @@ import server.yogoyogu.repository.likes.LikesRepository;
 import server.yogoyogu.repository.reply.ReplyRepository;
 import server.yogoyogu.service.board.BoardService;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,14 +68,11 @@ public class BoardServiceUnitTest {
     @DisplayName("게시글 전체 조회")
     public void findAllTest() {
         // given
-        List<Board> boards = List.of(createBoard(createUser()));
-        given(boardRepository.findAll()).willReturn(boards);
+        String sort = "likeCount";
+        Integer page = 0;
+        PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(sort).descending().and(Sort.by("id")));
 
-        // when
-        List<BoardFindAllResponseDto> result = boardService.findAll();
-
-        // then
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(pageRequest.getPageNumber()).isEqualTo(0);
     }
 
     @Test
@@ -84,6 +81,7 @@ public class BoardServiceUnitTest {
         // given
         Long id = 1L;
         Board board = createBoard(createUser());
+
         given(boardRepository.findById(id)).willReturn(Optional.of(board));
 
         // when
@@ -110,6 +108,7 @@ public class BoardServiceUnitTest {
 
         // then
         assertThat(result).isEqualTo(ans);
+
     }
 
     @Test

@@ -79,14 +79,18 @@ public class BoardControllerUnitTest {
     @DisplayName("게시글 전체 조회")
     public void findAllTest() throws Exception {
         // given
+        String sort = "id";
+        Integer page = 0;
 
         // when
         mockMvc.perform(
                 get("/api/boards")
+                        .param("sort", sort)
+                        .param("page", String.valueOf(page))
         ).andExpect(status().isOk());
 
         // then
-        verify(boardService).findAll();
+        verify(boardService).findAll(sort, page);
     }
 
     @Test
