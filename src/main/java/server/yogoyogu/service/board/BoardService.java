@@ -7,15 +7,18 @@ import server.yogoyogu.dto.board.BoardCreateRequestDto;
 import server.yogoyogu.dto.board.BoardEditRequestDto;
 import server.yogoyogu.dto.board.BoardFindAllResponseDto;
 import server.yogoyogu.dto.board.BoardResponseDto;
+import server.yogoyogu.dto.reply.ReplyCreateRequestDto;
+import server.yogoyogu.dto.reply.ReplyEditRequestDto;
+import server.yogoyogu.dto.reply.ReplyResponseDto;
 import server.yogoyogu.entity.board.Board;
 import server.yogoyogu.entity.likes.Likes;
 import server.yogoyogu.entity.member.Authority;
 import server.yogoyogu.entity.member.Member;
-import server.yogoyogu.exception.BoardNotFoundException;
-import server.yogoyogu.exception.BoardOnlyWriteStudentException;
-import server.yogoyogu.exception.MemberNotEqualsException;
+import server.yogoyogu.entity.reply.Reply;
+import server.yogoyogu.exception.*;
 import server.yogoyogu.repository.board.BoardRepository;
 import server.yogoyogu.repository.likes.LikesRepository;
+import server.yogoyogu.repository.reply.ReplyRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +30,11 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final LikesRepository likesRepository;
+    private final ReplyRepository replyRepository;
 
     @Transactional
     public void create(BoardCreateRequestDto req, Member member) {
-        validateAuthority(member);
+        validateAuthorityIsUser(member);
         Board board = new Board(member, req.getTitle(), req.getContent());
         boardRepository.save(board);
     }
@@ -54,7 +58,7 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(BoardNotFoundException::new);
         boolean isLiked = checkIsLiked(board, member);
 
-        if(isLiked) {
+        if (isLiked) {
             // 좋아요 처리된 경우 => 좋아요 취소
             Likes like = likesRepository.findByMemberAndBoard(member, board).get();
             likesRepository.delete(like);
@@ -83,14 +87,62 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
-    public void validateAuthority(Member member) {
+    // 학생회
+
+    @Transactional
+    public void createReply(ReplyCreateRequestDto req, Long boardId, Member member) {
+        validateAuthorityIsManager(member);
+        Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+        validateAlreadyWroteReply(board, member);
+
+        board.repliedSuccess();
+        Reply reply = new Reply(member, req.getContent(), board);
+
+        replyRepository.save(reply);
+    }
+
+    @Transactional(readOnly = true)
+    public ReplyResponseDto findReply(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+        Reply reply = replyRepository.findByBoard(board).orElseThrow(ReplyNotFoundException::new);
+        ReplyResponseDto result = ReplyResponseDto.toDto(reply);
+        return result;
+    }
+
+    @Transactional
+    public void editReply(Long boardId, ReplyEditRequestDto req, Member member) {
+        Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+        Reply reply = replyRepository.findByBoard(board).orElseThrow(BoardNotFoundException::new);
+        validateOwnReply(reply, member);
+        reply.setContent(req.getContent());
+    }
+
+    public void validateAuthorityIsManager(Member member) {
+        if (!member.getAuthority().equals(Authority.ROLE_MANAGER)) {
+            throw new ReplyOnlyWriteStudentException();
+        }
+    }
+
+    public void validateAuthorityIsUser(Member member) {
         if (member.getAuthority().equals(Authority.ROLE_MANAGER)) {
             throw new BoardOnlyWriteStudentException();
         }
     }
 
+    public void validateAlreadyWroteReply(Board board, Member member) {
+        if(replyRepository.existsByBoardAndMember(board, member)) {
+            throw new ReplyAlreadyWroteException();
+        }
+    }
+
     public void validateOwnBoard(Board board, Member member) {
         if (!board.getMember().equals(member)) {
+            throw new MemberNotEqualsException();
+        }
+    }
+
+    public void validateOwnReply(Reply reply, Member member) {
+        if (!reply.getMember().equals(member)) {
             throw new MemberNotEqualsException();
         }
     }

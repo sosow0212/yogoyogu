@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import server.yogoyogu.dto.board.BoardCreateRequestDto;
 import server.yogoyogu.dto.board.BoardEditRequestDto;
+import server.yogoyogu.dto.reply.ReplyCreateRequestDto;
+import server.yogoyogu.dto.reply.ReplyEditRequestDto;
 import server.yogoyogu.dto.sign.SignupRequestDto;
 import server.yogoyogu.entity.member.Member;
 import server.yogoyogu.exception.MemberNotFoundException;
@@ -81,6 +83,34 @@ public class BoardController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Member member = memberRepository.findByUsername(authentication.getName()).orElseThrow(MemberNotFoundException::new);
         boardService.delete(boardId, member);
+        return Response.success();
+    }
+
+    // 학생회
+    @ApiOperation(value = "학생회 답변 등록", notes = "학생회 답변을 등록합니다.")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/boards/{boardId}/replies")
+    public Response createReply(@PathVariable("boardId") Long boardId, @Valid @RequestBody ReplyCreateRequestDto req) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = memberRepository.findByUsername(authentication.getName()).orElseThrow(MemberNotFoundException::new);
+        boardService.createReply(req, boardId, member);
+        return Response.success();
+    }
+
+    @ApiOperation(value = "학생회 답변 조회", notes = "학생회 답변을 조회합니다.")
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/boards/{boardId}/replies")
+    public Response findReply(@PathVariable("boardId") Long boardId) {
+        return Response.success(boardService.findReply(boardId));
+    }
+
+    @ApiOperation(value = "학생회 답변 수정", notes = "학생회 답변을 수정합니다.")
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/boards/{boardId}/replies")
+    public Response editReply(@PathVariable("boardId") Long boardId, @Valid @RequestBody ReplyEditRequestDto req) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = memberRepository.findByUsername(authentication.getName()).orElseThrow(MemberNotFoundException::new);
+        boardService.editReply(boardId, req, member);
         return Response.success();
     }
 }

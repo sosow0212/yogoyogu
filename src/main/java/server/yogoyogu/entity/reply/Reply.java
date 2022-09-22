@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import server.yogoyogu.entity.board.Board;
 import server.yogoyogu.entity.common.EntityDate;
 import server.yogoyogu.entity.member.Member;
 
@@ -25,8 +26,16 @@ public class Reply extends EntityDate {
     private Member member;
 
     @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
     private String content;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Board board;
+
+    public Reply(Member member, String content, Board board) {
+        this.member = member;
+        this.content = content;
+        this.board = board;
+    }
 }

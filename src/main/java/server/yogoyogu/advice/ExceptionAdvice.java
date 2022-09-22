@@ -110,8 +110,17 @@ public class ExceptionAdvice {
     @ExceptionHandler(BoardOnlyWriteStudentException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Response boardOnlyWriteStudent() {
-        return Response.failure(401, "학생회는 건의 게시판에 글을 작성할 수 없습니다.");
+        return Response.failure(401, "일반 학생만 건의 게시판에 글을 작성할 수 있습니다.");
     }
+
+    // 401 응답
+    // 게시글은 학생회만 작성 가능
+    @ExceptionHandler(ReplyOnlyWriteStudentException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Response replyOnlyWriteStudentException() {
+        return Response.failure(401, "학생회만 답장을 작성할 수 없습니다.");
+    }
+
 
     // 404 응답
     // 요청한 User를 찾을 수 없음
@@ -146,6 +155,15 @@ public class ExceptionAdvice {
         return Response.failure(404, "이메일 인증 키를 찾을 수 없습니다.");
     }
 
+    // 404 응답
+    // Reply 찾을 수 없음
+    @ExceptionHandler(ReplyNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response replyNotFoundException() {
+        return Response.failure(404, "답변을 찾을 수 없습니다.");
+    }
+
+
     // 409 응답
     // username 중복
     @ExceptionHandler(MemberUsernameAlreadyExistsException.class)
@@ -177,6 +195,15 @@ public class ExceptionAdvice {
     public Response memberPhoneAlreadyExistsException(MemberPhoneAlreadyExistsException e) {
         return Response.failure(409, e.getMessage() + "은 중복된 번호 입니다.");
     }
+
+    // 409 응답
+    // 답변 중복
+    @ExceptionHandler(ReplyAlreadyWroteException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Response replyAlreadyWroteException() {
+        return Response.failure(409, "이미 답변을 작성하셨습니다.");
+    }
+
 
 
 }

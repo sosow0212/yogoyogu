@@ -31,8 +31,10 @@ public class Board extends EntityDate {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
     private boolean isReplied;
 
+    @Column(nullable = false)
     private Long likesCount;
 
     public Board(Member member, String title, String content) {
@@ -48,7 +50,7 @@ public class Board extends EntityDate {
         this.setContent(req.getContent());
     }
 
-    public void repliedProcess() {
+    public void repliedSuccess() {
         this.isReplied = true;
     }
 
