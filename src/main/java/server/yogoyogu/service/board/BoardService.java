@@ -1,12 +1,12 @@
 package server.yogoyogu.service.board;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import server.yogoyogu.dto.board.BoardCreateRequestDto;
-import server.yogoyogu.dto.board.BoardEditRequestDto;
-import server.yogoyogu.dto.board.BoardFindAllResponseDto;
-import server.yogoyogu.dto.board.BoardResponseDto;
+import server.yogoyogu.dto.board.*;
 import server.yogoyogu.dto.reply.ReplyCreateRequestDto;
 import server.yogoyogu.dto.reply.ReplyEditRequestDto;
 import server.yogoyogu.dto.reply.ReplyResponseDto;
@@ -40,10 +40,18 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public List<BoardFindAllResponseDto> findAll() {
-        List<Board> boards = boardRepository.findAll();
-        List<BoardFindAllResponseDto> result = new ArrayList<>();
-        boards.stream().map(i -> result.add(new BoardFindAllResponseDto().toDto(i))).collect(Collectors.toList());
+    public BoardFindAllResponseDto findAll(String sort, Integer page) {
+        PageRequest pageRequest;
+        if(sort.equals("likesCount")) {
+            pageRequest = PageRequest.of(page, 10, Sort.by(sort).descending().and(Sort.by("id")));
+        } else {
+            pageRequest = PageRequest.of(page, 10, Sort.by(sort).descending());
+        }
+        Page<Board> boards = boardRepository.findAll(pageRequest);
+        List<BoardSimpleDto> boardSimpleDtos = new ArrayList<>();
+        boards.stream().map(i -> boardSimpleDtos.add(BoardSimpleDto.toDto(i))).collect(Collectors.toList());
+        PageInfoDto pageInfoDto = new PageInfoDto(boards);
+        BoardFindAllResponseDto result = new BoardFindAllResponseDto(boardSimpleDtos, pageInfoDto);
         return result;
     }
 

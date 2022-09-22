@@ -3,6 +3,12 @@ package server.yogoyogu.controller.board;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,10 +48,10 @@ public class BoardController {
     @ApiOperation(value = "게시글 전체 목록 조회", notes = "게시글을 전체 조회합니다.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/boards")
-    public Response findAll() {
-        return Response.success(boardService.findAll());
+    public Response findAll(@RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue = "0") Integer page) {
+        // http://localhost:8080/api/boards?sort=likesCount&page=0
+        return Response.success(boardService.findAll(sort, page));
     }
-
 
     @ApiOperation(value = "게시글 상세 조회", notes = "게시글을 상세 조회합니다.")
     @ResponseStatus(HttpStatus.OK)

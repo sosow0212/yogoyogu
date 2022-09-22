@@ -5,17 +5,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.yogoyogu.entity.board.Board;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class BoardFindAllResponseDto {
-    private Long boardId;
-    private String title;
-    private String writer_name;
-    private Long likesCount;
-    private Boolean isReplied;
+    private List<BoardSimpleDto> boards;
+    private PageInfoDto pageInfo;
 
-    public static BoardFindAllResponseDto toDto(Board b) {
-        return new BoardFindAllResponseDto(b.getId(), b.getTitle(), b.getMember().getName(), b.getLikesCount(), b.isReplied());
+    public static BoardFindAllResponseDto toDto(List<BoardSimpleDto> boards, PageInfoDto pageInfo) {
+        return new BoardFindAllResponseDto(boards ,pageInfo);
     }
 }
