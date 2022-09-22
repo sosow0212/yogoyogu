@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import server.yogoyogu.controller.board.BoardController;
 import server.yogoyogu.dto.board.BoardCreateRequestDto;
 import server.yogoyogu.dto.board.BoardEditRequestDto;
+import server.yogoyogu.dto.reply.ReplyCreateRequestDto;
+import server.yogoyogu.dto.reply.ReplyEditRequestDto;
 import server.yogoyogu.entity.member.Member;
 import server.yogoyogu.repository.Member.MemberRepository;
 import server.yogoyogu.service.board.BoardService;
@@ -95,7 +97,7 @@ public class BoardControllerUnitTest {
 
         // when
         mockMvc.perform(
-                get("/api/boards/{id}",id)
+                get("/api/boards/{id}", id)
         ).andExpect(status().isOk());
 
         // then
@@ -160,5 +162,66 @@ public class BoardControllerUnitTest {
 
         // then
         verify(boardService).delete(id, member);
+    }
+
+
+    // 학생회
+    @Test
+    @DisplayName("학생회 답변 등록")
+    public void createReplyTest() throws Exception {
+        // given
+        Long boardId = 1L;
+        Member member = createUser();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId(), "", Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        given(memberRepository.findByUsername(authentication.getName())).willReturn(Optional.of(member));
+        ReplyCreateRequestDto req = new ReplyCreateRequestDto("답장");
+
+        // when
+        mockMvc.perform(
+                post("/api/boards/{boardId}/replies", boardId)
+                        .content(objectMapper.writeValueAsString(req))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isCreated());
+
+        // then
+        verify(boardService).createReply(req, boardId, member);
+    }
+
+    @Test
+    @DisplayName("학생회 답변 조회")
+    public void findReplyTest() throws Exception {
+        // given
+        Long boardId = 1L;
+
+        // when
+        mockMvc.perform(
+                get("/api/boards/{boardId}/replies", boardId)
+        ).andExpect(status().isOk());
+
+        // then
+        verify(boardService).findReply(boardId);
+    }
+
+    @Test
+    @DisplayName("학생회 답변 수정")
+    public void editReplyTest() throws Exception {
+        // given
+        Long id = 1L;
+        Member member = createUser();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId(), "", Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        given(memberRepository.findByUsername(authentication.getName())).willReturn(Optional.of(member));
+        ReplyEditRequestDto req = new ReplyEditRequestDto("답변");
+
+        // when
+        mockMvc.perform(
+                put("/api/boards/{boardId}/replies", id)
+                        .content(objectMapper.writeValueAsString(req))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        // then
+        verify(boardService).editReply(id, req, member);
     }
 }

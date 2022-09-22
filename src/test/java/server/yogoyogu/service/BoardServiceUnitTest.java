@@ -10,11 +10,16 @@ import server.yogoyogu.dto.board.BoardCreateRequestDto;
 import server.yogoyogu.dto.board.BoardEditRequestDto;
 import server.yogoyogu.dto.board.BoardFindAllResponseDto;
 import server.yogoyogu.dto.board.BoardResponseDto;
+import server.yogoyogu.dto.reply.ReplyCreateRequestDto;
+import server.yogoyogu.dto.reply.ReplyEditRequestDto;
+import server.yogoyogu.dto.reply.ReplyResponseDto;
 import server.yogoyogu.entity.board.Board;
 import server.yogoyogu.entity.likes.Likes;
 import server.yogoyogu.entity.member.Member;
+import server.yogoyogu.entity.reply.Reply;
 import server.yogoyogu.repository.board.BoardRepository;
 import server.yogoyogu.repository.likes.LikesRepository;
+import server.yogoyogu.repository.reply.ReplyRepository;
 import server.yogoyogu.service.board.BoardService;
 
 import java.util.List;
@@ -25,7 +30,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static server.yogoyogu.factory.BoardFactory.createBoard;
+import static server.yogoyogu.factory.MemberFactory.createManager;
 import static server.yogoyogu.factory.MemberFactory.createUser;
+import static server.yogoyogu.factory.ReplyFactory.createReply;
 
 @ExtendWith(MockitoExtension.class)
 public class BoardServiceUnitTest {
@@ -38,6 +45,9 @@ public class BoardServiceUnitTest {
 
     @Mock
     LikesRepository likesRepository;
+
+    @Mock
+    ReplyRepository replyRepository;
 
     @Test
     @DisplayName("게시글 생성")
@@ -157,5 +167,66 @@ public class BoardServiceUnitTest {
 
         // then
         verify(boardRepository).delete(board);
+    }
+
+    @Test
+    @DisplayName("학생회 답변 등록")
+    public void createReplyTest() {
+        // given
+        Long id = 1L;
+        ReplyCreateRequestDto req = new ReplyCreateRequestDto("답장");
+        Member member = createManager();
+        Board board = createBoard(createUser());
+
+        given(boardRepository.findById(id)).willReturn(Optional.of(board));
+        given(replyRepository.existsByBoardAndMember(board, member)).willReturn(false);
+
+        Reply reply = new Reply(member, req.getContent(), board);
+
+        // when
+        boardService.createReply(req, id, member);
+
+        // then
+        verify(replyRepository).save(reply);
+    }
+
+    @Test
+    @DisplayName("학생회 답변 조회")
+    public void findReplyTest() {
+        // given
+        Long id = 1L;
+        Member member = createManager();
+        Board board = createBoard(createUser());
+        Reply reply = createReply(board, member);
+
+        given(boardRepository.findById(id)).willReturn(Optional.of(board));
+        given(replyRepository.findByBoard(board)).willReturn(Optional.of(reply));
+
+        // when
+        ReplyResponseDto result = boardService.findReply(id);
+
+        // then
+        assertThat(result.getContent()).isEqualTo(reply.getContent());
+    }
+
+    @Test
+    @DisplayName("학생회 답변 수정")
+    public void editReplyTest() {
+        // given
+        Long id = 1L;
+        Member member = createManager();
+        Board board = createBoard(createUser());
+        Reply reply = createReply(board, member);
+        ReplyEditRequestDto req = new ReplyEditRequestDto("수정");
+
+        given(boardRepository.findById(id)).willReturn(Optional.of(board));
+        given(replyRepository.findByBoard(board)).willReturn(Optional.of(reply));
+
+
+        // when
+        boardService.editReply(id, req, member);
+
+        // then
+        assertThat(reply.getContent()).isEqualTo(req.getContent());
     }
 }
