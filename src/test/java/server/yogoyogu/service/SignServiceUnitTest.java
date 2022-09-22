@@ -67,10 +67,10 @@ public class SignServiceUnitTest {
         given(emailAuthRepository.existsByKey(code)).willReturn(true);
 
         // when
-        boolean result = signService.confirmMailCode(code);
+        String result = signService.confirmMailCode(code);
 
         // then
-        assertThat(result).isEqualTo(true);
+        assertThat(result).isEqualTo("인증번호가 확인되었습니다.");
     }
 
 

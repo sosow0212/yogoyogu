@@ -75,9 +75,9 @@ public class SignService {
     }
 
     @Transactional(readOnly = true)
-    public boolean confirmMailCode(String code) {
+    public String confirmMailCode(String code) {
         if(emailAuthRepository.existsByKey(code)) {
-            return true;
+            return "인증번호가 확인되었습니다.";
         } else {
             throw new EmailAuthNotEqualsException();
         }
