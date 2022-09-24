@@ -77,15 +77,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/image/**").permitAll() // images
                 .antMatchers("/api/sign-up", "/api/sign-in", "/api/reissue", "/api/sign-up/email", "/api/sign-up/email/check").permitAll() // auth
 
-                .antMatchers(HttpMethod.GET, "/api/boards/**").access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+                .antMatchers(HttpMethod.GET, "/api/boards/**").access("hasRole('ROLE_USER') or hasRole('ROLE_SEOUL_MANAGER') or hasRole('ROLE_YONGIN_MANAGER')  or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                 .antMatchers(HttpMethod.POST, "/api/boards").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-                .antMatchers(HttpMethod.POST, "/api/boards/{id}").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+                .antMatchers(HttpMethod.POST, "/api/boards/{id}").access("hasRole('ROLE_USER') or hasRole('ROLE_SEOUL_MANAGER') or hasRole('ROLE_YONGIN_MANAGER')  or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                 .antMatchers(HttpMethod.PUT, "/api/boards/{id}").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
                 .antMatchers(HttpMethod.DELETE, "/api/boards/{id}").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
 
-                .antMatchers(HttpMethod.GET, "/api/boards/{id}/replies").access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-                .antMatchers(HttpMethod.POST, "/api/boards/{id}/replies").access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-                .antMatchers(HttpMethod.PUT, "/api/boards/{id}/replies").access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+                .antMatchers(HttpMethod.GET, "/api/boards/{id}/replies").access("hasRole('ROLE_USER') or hasRole('ROLE_SEOUL_MANAGER') or hasRole('ROLE_YONGIN_MANAGER')  or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+                .antMatchers(HttpMethod.POST, "/api/boards/{id}/replies").access("hasRole('ROLE_SEOUL_MANAGER') or hasRole('ROLE_YONGIN_MANAGER')  or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+                .antMatchers(HttpMethod.PUT, "/api/boards/{id}/replies").access("hasRole('ROLE_SEOUL_MANAGER') or hasRole('ROLE_YONGIN_MANAGER')  or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
 
 
                 .antMatchers("/test").permitAll()

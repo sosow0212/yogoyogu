@@ -115,10 +115,10 @@ public class ExceptionAdvice {
 
     // 401 응답
     // 게시글은 학생회만 작성 가능
-    @ExceptionHandler(ReplyOnlyWriteStudentException.class)
+    @ExceptionHandler(ReplyOnlyWriteStudentManagerException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public Response replyOnlyWriteStudentException() {
-        return Response.failure(401, "학생회만 답장을 작성할 수 없습니다.");
+    public Response replyOnlyWriteStudentManagerException() {
+        return Response.failure(401, "관련 학생회만 답장을 작성할 수 없습니다.");
     }
 
 

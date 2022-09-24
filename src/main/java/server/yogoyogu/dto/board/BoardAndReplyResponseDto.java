@@ -16,6 +16,10 @@ public class BoardAndReplyResponseDto {
     private ReplyResponseDto reply;
 
     public static BoardAndReplyResponseDto toDto(Board board, Reply reply) {
-        return new BoardAndReplyResponseDto(new BoardResponseDto().toDto(board), new ReplyResponseDto().toDto(reply));
+        if(reply == null) {
+            return new BoardAndReplyResponseDto(new BoardResponseDto().toDto(board), null);
+        } else {
+            return new BoardAndReplyResponseDto(new BoardResponseDto().toDto(board), new ReplyResponseDto().toDto(reply));
+        }
     }
 }

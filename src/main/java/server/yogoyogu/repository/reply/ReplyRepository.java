@@ -11,4 +11,5 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     Optional<Reply> findByBoard(Board board);
     boolean existsByBoardAndMember(Board board, Member member);
+    boolean existsByBoard(Board board);
 }

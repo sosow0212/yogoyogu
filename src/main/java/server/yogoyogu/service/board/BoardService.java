@@ -35,20 +35,24 @@ public class BoardService {
     @Transactional
     public void create(BoardCreateRequestDto req, Member member) {
         validateAuthorityIsUser(member);
-        Board board = new Board(member, req.getTitle(), req.getContent());
+        Authority tag = selectTag(req.getTag());
+        Board board = new Board(member, req.getTitle(), req.getContent(), tag);
         boardRepository.save(board);
     }
 
     @Transactional(readOnly = true)
     public BoardFindAllResponseDto findAll(String sort, Integer page) {
         PageRequest pageRequest;
-        if(sort.equals("likesCount")) {
+        if (sort.equals("likesCount")) {
             pageRequest = PageRequest.of(page, 10, Sort.by(sort).descending().and(Sort.by("id")));
         } else {
             pageRequest = PageRequest.of(page, 10, Sort.by(sort).descending());
         }
+
+
         Page<Board> boards = boardRepository.findAll(pageRequest);
         List<BoardSimpleDto> boardSimpleDtos = new ArrayList<>();
+
         boards.stream().map(i -> boardSimpleDtos.add(BoardSimpleDto.toDto(i))).collect(Collectors.toList());
         PageInfoDto pageInfoDto = new PageInfoDto(boards);
         BoardFindAllResponseDto result = new BoardFindAllResponseDto(boardSimpleDtos, pageInfoDto);
@@ -56,9 +60,10 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public BoardResponseDto find(Long id) {
+    public BoardAndReplyResponseDto find(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(BoardNotFoundException::new);
-        return new BoardResponseDto().toDto(board);
+        Reply reply = replyRepository.existsByBoard(board) ? replyRepository.findByBoard(board).get() : null;
+        return new BoardAndReplyResponseDto().toDto(board, reply);
     }
 
     @Transactional
@@ -85,7 +90,6 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(BoardNotFoundException::new);
         validateOwnBoard(board, member);
         board.editBoard(req);
-        System.out.println(board.getTitle());
     }
 
     @Transactional
@@ -99,9 +103,9 @@ public class BoardService {
 
     @Transactional
     public void createReply(ReplyCreateRequestDto req, Long boardId, Member member) {
-        validateAuthorityIsManager(member);
         Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
-        validateAlreadyWroteReply(board, member);
+        validateBoardTagEqualsMemberAuth(member, board);
+        validateAlreadyWroteReply(board);
 
         board.repliedSuccess();
         Reply reply = new Reply(member, req.getContent(), board);
@@ -125,20 +129,39 @@ public class BoardService {
         reply.setContent(req.getContent());
     }
 
-    public void validateAuthorityIsManager(Member member) {
-        if (!member.getAuthority().equals(Authority.ROLE_MANAGER)) {
-            throw new ReplyOnlyWriteStudentException();
+    public Authority selectTag(String tag) {
+        if (tag.equals("none")) {
+            return Authority.ROLE_ANY;
+        } else if (tag.equals("인문캠")) {
+            return Authority.ROLE_SEOUL_MANAGER;
+        } else if (tag.equals("자연캠")) {
+            return Authority.ROLE_YONGIN_MANAGER;
+        } else if (tag.equals("총학생회")) {
+            return Authority.ROLE_MANAGER;
+        } else {
+            return Authority.ROLE_ANY;
+        }
+    }
+
+    public void validateBoardTagEqualsMemberAuth(Member member, Board board) {
+        Authority boardAuth = board.getTag();
+        Authority memberAuth = member.getAuthority();
+        if(boardAuth == Authority.ROLE_ANY) {
+            return;
+        }
+        if (boardAuth != memberAuth) {
+            throw new ReplyOnlyWriteStudentManagerException();
         }
     }
 
     public void validateAuthorityIsUser(Member member) {
-        if (member.getAuthority().equals(Authority.ROLE_MANAGER)) {
+        if (!member.getAuthority().equals(Authority.ROLE_USER)) {
             throw new BoardOnlyWriteStudentException();
         }
     }
 
-    public void validateAlreadyWroteReply(Board board, Member member) {
-        if(replyRepository.existsByBoardAndMember(board, member)) {
+    public void validateAlreadyWroteReply(Board board) {
+        if (replyRepository.existsByBoard(board)) {
             throw new ReplyAlreadyWroteException();
         }
     }

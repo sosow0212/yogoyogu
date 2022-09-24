@@ -20,4 +20,8 @@ public class BoardEditRequestDto {
     @ApiModelProperty(value = "본문", notes = "본문을 입력해주세요", required = true, example = "교내 주차 공간 좀 늘려주세요!")
     @NotBlank(message = "본문을 입력해주세요.")
     private String content;
+
+    @ApiModelProperty(value = "말머리", notes = "말머리를 입력해주세요.(none - 말머리없음, 인문캠, 자연캠, 총학생회)" , required = true, example = "인문캠")
+    @NotBlank(message = "태그를 선택 해주세요.")
+    private String tag;
 }
