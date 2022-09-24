@@ -62,14 +62,14 @@ public class BoardControllerUnitTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         given(memberRepository.findByUsername(authentication.getName())).willReturn(Optional.of(member));
 
-        BoardCreateRequestDto req = new BoardCreateRequestDto("title", "content");
+        BoardCreateRequestDto req = new BoardCreateRequestDto("title", "content","인문캠");
 
         // when
         mockMvc.perform(
                 post("/api/boards")
                         .content(objectMapper.writeValueAsString(req))
                         .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isCreated());
+        ).andExpect(status().isOk());
 
         // then
         verify(boardService).create(req, member);
@@ -136,7 +136,7 @@ public class BoardControllerUnitTest {
         Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId(), "", Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         given(memberRepository.findByUsername(authentication.getName())).willReturn(Optional.of(member));
-        BoardEditRequestDto req = new BoardEditRequestDto("수정", "내용 수정");
+        BoardEditRequestDto req = new BoardEditRequestDto("수정", "내용 수정", "자연캠");
 
         // when
         mockMvc.perform(
@@ -186,7 +186,7 @@ public class BoardControllerUnitTest {
                 post("/api/boards/{boardId}/replies", boardId)
                         .content(objectMapper.writeValueAsString(req))
                         .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isCreated());
+        ).andExpect(status().isOk());
 
         // then
         verify(boardService).createReply(req, boardId, member);

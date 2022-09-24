@@ -46,7 +46,7 @@ public class SignServiceUnitTest {
     @DisplayName("유저 회원가입 서비스")
     void userSignupTest() {
         // given
-        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", 0, "mailAuth");
+        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", "mailAuth");
         EmailAuth emailAuth = new EmailAuth("mailAuth", "dd@naver.com");
         given(emailAuthRepository.findEmailAuthByEmail(req.getEmail())).willReturn(Optional.of(emailAuth));
 

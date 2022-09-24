@@ -47,14 +47,14 @@ public class SignControllerUnitTest {
     @DisplayName("유저 회원가입")
     void userSignupTest() throws Exception {
         // given
-        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", 0, "d123");
+        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", "d123");
 
         // when
         mockMvc.perform(
                         post("/api/sign-up")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 
         // then
         verify(signService).signUp(req);
@@ -64,14 +64,14 @@ public class SignControllerUnitTest {
     @DisplayName("학생회 회원가입")
     void managerSignupTest() throws Exception {
         // given
-        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", 1, "d123");
+        SignupRequestDto req = new SignupRequestDto("user", "user123!", "이름", "닉네임", "dd@naver.com", "d123");
 
         // when
         mockMvc.perform(
                         post("/api/sign-up")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 
         // then
         verify(signService).signUp(req);

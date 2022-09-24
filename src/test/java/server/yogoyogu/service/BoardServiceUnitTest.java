@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import server.yogoyogu.dto.board.BoardAndReplyResponseDto;
 import server.yogoyogu.dto.board.BoardCreateRequestDto;
 import server.yogoyogu.dto.board.BoardEditRequestDto;
 import server.yogoyogu.dto.board.BoardResponseDto;
@@ -55,7 +56,7 @@ public class BoardServiceUnitTest {
         // given
         Member member = createUser();
         Board board = createBoard(member);
-        BoardCreateRequestDto req = new BoardCreateRequestDto("title", "content");
+        BoardCreateRequestDto req = new BoardCreateRequestDto("title", "content", "none");
 
         // when
         boardService.create(req, member);
@@ -81,14 +82,17 @@ public class BoardServiceUnitTest {
         // given
         Long id = 1L;
         Board board = createBoard(createUser());
+        Reply reply = new Reply(createManager(), "hi", board); // member content board
 
         given(boardRepository.findById(id)).willReturn(Optional.of(board));
+        given(replyRepository.existsByBoard(board)).willReturn(true);
+        given(replyRepository.findByBoard(board)).willReturn(Optional.of(reply));
 
         // when
-        BoardResponseDto result = boardService.find(id);
+        BoardAndReplyResponseDto result = boardService.find(id);
 
         // then
-        assertThat(result.getContent()).isEqualTo(board.getContent());
+        assertThat(result.getBoards().getContent()).isEqualTo(board.getContent());
     }
 
     @Test
@@ -139,7 +143,7 @@ public class BoardServiceUnitTest {
     public void editTest() {
         // given
         Long id = 1L;
-        BoardEditRequestDto req = new BoardEditRequestDto("title2", "content2");
+        BoardEditRequestDto req = new BoardEditRequestDto("title2", "content2", "none");
         Member member = createUser();
         Board board = createBoard(member);
         given(boardRepository.findById(id)).willReturn(Optional.of(board));
@@ -178,7 +182,7 @@ public class BoardServiceUnitTest {
         Board board = createBoard(createUser());
 
         given(boardRepository.findById(id)).willReturn(Optional.of(board));
-        given(replyRepository.existsByBoardAndMember(board, member)).willReturn(false);
+        given(replyRepository.existsByBoard(board)).willReturn(false);
 
         Reply reply = new Reply(member, req.getContent(), board);
 

@@ -3,12 +3,6 @@ package server.yogoyogu.controller.board;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +11,6 @@ import server.yogoyogu.dto.board.BoardCreateRequestDto;
 import server.yogoyogu.dto.board.BoardEditRequestDto;
 import server.yogoyogu.dto.reply.ReplyCreateRequestDto;
 import server.yogoyogu.dto.reply.ReplyEditRequestDto;
-import server.yogoyogu.dto.sign.SignupRequestDto;
 import server.yogoyogu.entity.member.Member;
 import server.yogoyogu.exception.MemberNotFoundException;
 import server.yogoyogu.repository.Member.MemberRepository;
@@ -36,7 +29,7 @@ public class BoardController {
     private final MemberRepository memberRepository;
 
     @ApiOperation(value = "게시글 생성", notes = "게시글 생성")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/boards")
     public Response create(@Valid @RequestBody BoardCreateRequestDto req) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -94,7 +87,7 @@ public class BoardController {
 
     // 학생회
     @ApiOperation(value = "학생회 답변 등록", notes = "학생회 답변을 등록합니다.")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/boards/{boardId}/replies")
     public Response createReply(@PathVariable("boardId") Long boardId, @Valid @RequestBody ReplyCreateRequestDto req) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
