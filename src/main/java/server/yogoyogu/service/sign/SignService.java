@@ -46,13 +46,7 @@ public class SignService {
 
         validateSignUpInfo(req);
 
-        Authority authority;
-        if (req.getAuthorityRadio() == 0) {
-            authority = Authority.ROLE_USER;
-        } else {
-            // 학생회
-            authority = Authority.ROLE_MANAGER;
-        }
+        Authority authority = Authority.ROLE_USER;
 
         Member member = Member.builder()
                 .username(req.getUsername())
