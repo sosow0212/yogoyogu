@@ -83,13 +83,15 @@ public class BoardServiceUnitTest {
         Long id = 1L;
         Board board = createBoard(createUser());
         Reply reply = new Reply(createManager(), "hi", board); // member content board
+        Member member = createUser();
 
         given(boardRepository.findById(id)).willReturn(Optional.of(board));
         given(replyRepository.existsByBoard(board)).willReturn(true);
+        given(likesRepository.existsByMemberAndBoard(member, board)).willReturn(true);
         given(replyRepository.findByBoard(board)).willReturn(Optional.of(reply));
 
         // when
-        BoardAndReplyResponseDto result = boardService.find(id);
+        BoardAndReplyResponseDto result = boardService.find(id, member);
 
         // then
         assertThat(result.getBoards().getContent()).isEqualTo(board.getContent());

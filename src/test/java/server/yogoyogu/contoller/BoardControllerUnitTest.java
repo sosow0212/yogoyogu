@@ -82,6 +82,12 @@ public class BoardControllerUnitTest {
         String sort = "id";
         Integer page = 0;
 
+        Member member = createUser();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId(), "", Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        given(memberRepository.findByUsername(authentication.getName())).willReturn(Optional.of(member));
+
+
         // when
         mockMvc.perform(
                 get("/api/boards")
@@ -90,7 +96,7 @@ public class BoardControllerUnitTest {
         ).andExpect(status().isOk());
 
         // then
-        verify(boardService).findAll(sort, page);
+        verify(boardService).findAll(sort, page, member);
     }
 
     @Test
@@ -98,6 +104,11 @@ public class BoardControllerUnitTest {
     public void findTest() throws Exception {
         // given
         Long id = 1L;
+        Member member = createUser();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId(), "", Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        given(memberRepository.findByUsername(authentication.getName())).willReturn(Optional.of(member));
+
 
         // when
         mockMvc.perform(
@@ -105,7 +116,7 @@ public class BoardControllerUnitTest {
         ).andExpect(status().isOk());
 
         // then
-        verify(boardService).find(id);
+        verify(boardService).find(id, member);
     }
 
     @Test
