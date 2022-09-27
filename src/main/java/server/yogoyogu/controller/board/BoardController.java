@@ -43,14 +43,18 @@ public class BoardController {
     @GetMapping("/boards")
     public Response findAll(@RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue = "0") Integer page) {
         // http://localhost:8080/api/boards?sort=likesCount&page=0
-        return Response.success(boardService.findAll(sort, page));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = memberRepository.findByUsername(authentication.getName()).orElseThrow(MemberNotFoundException::new);
+        return Response.success(boardService.findAll(sort, page, member));
     }
 
     @ApiOperation(value = "게시글 상세 조회", notes = "게시글을 상세 조회합니다.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/boards/{boardId}")
     public Response find(@PathVariable("boardId") Long boardId) {
-        return Response.success(boardService.find(boardId));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = memberRepository.findByUsername(authentication.getName()).orElseThrow(MemberNotFoundException::new);
+        return Response.success(boardService.find(boardId, member));
     }
 
 

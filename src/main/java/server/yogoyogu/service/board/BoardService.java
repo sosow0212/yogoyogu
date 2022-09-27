@@ -41,7 +41,7 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public BoardFindAllResponseDto findAll(String sort, Integer page) {
+    public BoardFindAllResponseDto findAll(String sort, Integer page, Member member) {
         PageRequest pageRequest;
         if (sort.equals("likesCount")) {
             pageRequest = PageRequest.of(page, 10, Sort.by(sort).descending().and(Sort.by("id")));
@@ -53,17 +53,20 @@ public class BoardService {
         Page<Board> boards = boardRepository.findAll(pageRequest);
         List<BoardSimpleDto> boardSimpleDtos = new ArrayList<>();
 
-        boards.stream().map(i -> boardSimpleDtos.add(BoardSimpleDto.toDto(i))).collect(Collectors.toList());
+        boards.stream().map(i -> boardSimpleDtos.add(BoardSimpleDto.toDto(i, likesRepository.existsByMemberAndBoard(member, i)))).collect(Collectors.toList());
+
         PageInfoDto pageInfoDto = new PageInfoDto(boards);
         BoardFindAllResponseDto result = new BoardFindAllResponseDto(boardSimpleDtos, pageInfoDto);
         return result;
     }
 
     @Transactional(readOnly = true)
-    public BoardAndReplyResponseDto find(Long id) {
+    public BoardAndReplyResponseDto find(Long id, Member member) {
         Board board = boardRepository.findById(id).orElseThrow(BoardNotFoundException::new);
         Reply reply = replyRepository.existsByBoard(board) ? replyRepository.findByBoard(board).get() : null;
-        return new BoardAndReplyResponseDto().toDto(board, reply);
+
+        boolean isAlreadyPushedLikeByUser = likesRepository.existsByMemberAndBoard(member, board);
+        return new BoardAndReplyResponseDto().toDto(board, reply, member, isAlreadyPushedLikeByUser);
     }
 
     @Transactional

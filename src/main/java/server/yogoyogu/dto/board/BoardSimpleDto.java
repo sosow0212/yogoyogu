@@ -14,15 +14,16 @@ public class BoardSimpleDto {
     private String title;
     private String writer_name;
     private Long likesCount;
+    private Boolean isAlreadyPushedLikeByUser;
     private Boolean isReplied;
     private String tag;
 
-    public static BoardSimpleDto toDto(Board b) {
-        return new BoardSimpleDto(b.getId(), b.getTitle(), b.getMember().getName(), b.getLikesCount(), b.isReplied(), tagSelect(b.getTag()));
+    public static BoardSimpleDto toDto(Board b, boolean isAlreadyPushedLikeByUser) {
+        return new BoardSimpleDto(b.getId(), b.getTitle(), b.getMember().getName(), b.getLikesCount(), isAlreadyPushedLikeByUser, b.isReplied(), tagSelect(b.getTag()));
     }
 
-    public static String tagSelect (Authority tag) {
-        if(tag == Authority.ROLE_ANY) {
+    public static String tagSelect(Authority tag) {
+        if (tag == Authority.ROLE_ANY) {
             return "none";
         } else if (tag == Authority.ROLE_SEOUL_MANAGER) {
             return "인문캠";
