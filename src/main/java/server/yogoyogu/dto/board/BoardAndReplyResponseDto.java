@@ -17,12 +17,13 @@ public class BoardAndReplyResponseDto {
     private ReplyResponseDto reply;
     private Boolean isPermittedToReplyOrEdit;
     private Boolean isAlreadyPushedLikeByUser;
+    private Boolean isMineBoard;
 
-    public static BoardAndReplyResponseDto toDto(Board board, Reply reply, Member member, boolean isAlreadyPushedLikeByUser) {
+    public static BoardAndReplyResponseDto toDto(Board board, Reply reply, Member member, boolean isAlreadyPushedLikeByUser, boolean isMineBoard) {
         if (reply == null) {
-            return new BoardAndReplyResponseDto(new BoardResponseDto().toDto(board), null, member.getAuthority().equals(board.getTag()), isAlreadyPushedLikeByUser);
+            return new BoardAndReplyResponseDto(new BoardResponseDto().toDto(board), null, member.getAuthority().equals(board.getTag()), isAlreadyPushedLikeByUser, isMineBoard);
         } else {
-            return new BoardAndReplyResponseDto(new BoardResponseDto().toDto(board), new ReplyResponseDto().toDto(reply), member.getAuthority().equals(board.getTag()), isAlreadyPushedLikeByUser);
+            return new BoardAndReplyResponseDto(new BoardResponseDto().toDto(board), new ReplyResponseDto().toDto(reply), member.getAuthority().equals(board.getTag()), isAlreadyPushedLikeByUser, isMineBoard);
         }
     }
 }

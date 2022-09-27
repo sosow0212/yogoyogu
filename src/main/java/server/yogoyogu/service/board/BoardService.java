@@ -65,8 +65,9 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(BoardNotFoundException::new);
         Reply reply = replyRepository.existsByBoard(board) ? replyRepository.findByBoard(board).get() : null;
 
+        boolean isMineBoard = board.getMember().equals(member) ? true : false;
         boolean isAlreadyPushedLikeByUser = likesRepository.existsByMemberAndBoard(member, board);
-        return new BoardAndReplyResponseDto().toDto(board, reply, member, isAlreadyPushedLikeByUser);
+        return new BoardAndReplyResponseDto().toDto(board, reply, member, isAlreadyPushedLikeByUser, isMineBoard);
     }
 
     @Transactional
