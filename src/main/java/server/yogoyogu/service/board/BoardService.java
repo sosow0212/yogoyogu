@@ -61,6 +61,15 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
+    public List<BoardSimpleDto> findAllWithoutPaging(String sort, Member member) {
+        Sort s = Sort.by(Sort.Order.desc(sort), Sort.Order.desc("id"));
+        List<Board> list = boardRepository.findAll(s);
+        List<BoardSimpleDto> result = new ArrayList<>();
+        list.stream().map(i -> result.add(BoardSimpleDto.toDto(i, likesRepository.existsByMemberAndBoard(member, i)))).collect(Collectors.toList());
+        return result;
+    }
+
+    @Transactional(readOnly = true)
     public BoardAndReplyResponseDto find(Long id, Member member) {
         Board board = boardRepository.findById(id).orElseThrow(BoardNotFoundException::new);
         Reply reply = replyRepository.existsByBoard(board) ? replyRepository.findByBoard(board).get() : null;
@@ -150,7 +159,7 @@ public class BoardService {
     public void validateBoardTagEqualsMemberAuth(Member member, Board board) {
         Authority boardAuth = board.getTag();
         Authority memberAuth = member.getAuthority();
-        if(boardAuth == Authority.ROLE_ANY) {
+        if (boardAuth == Authority.ROLE_ANY) {
             return;
         }
         if (boardAuth != memberAuth) {

@@ -38,7 +38,7 @@ public class BoardController {
         return Response.success();
     }
 
-    @ApiOperation(value = "게시글 전체 목록 조회", notes = "게시글을 전체 조회합니다.")
+    @ApiOperation(value = "게시글 전체 목록 조회 (페이징)", notes = "게시글을 전체 조회합니다. (페이징)")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/boards")
     public Response findAll(@RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue = "0") Integer page) {
@@ -46,6 +46,16 @@ public class BoardController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Member member = memberRepository.findByUsername(authentication.getName()).orElseThrow(MemberNotFoundException::new);
         return Response.success(boardService.findAll(sort, page, member));
+    }
+
+    @ApiOperation(value = "게시글 전체 목록 조회 (페이징 없음)", notes = "게시글을 전체 조회합니다. (페이징 없음)")
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/boards/all")
+    public Response findAllWithoutPaging(@RequestParam(defaultValue = "id") String sort) {
+        // http://localhost:8080/api/boards/all?sort=likesCount
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = memberRepository.findByUsername(authentication.getName()).orElseThrow(MemberNotFoundException::new);
+        return Response.success(boardService.findAllWithoutPaging(sort, member));
     }
 
     @ApiOperation(value = "게시글 상세 조회", notes = "게시글을 상세 조회합니다.")
