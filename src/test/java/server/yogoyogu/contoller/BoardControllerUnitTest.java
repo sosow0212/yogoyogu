@@ -76,7 +76,7 @@ public class BoardControllerUnitTest {
     }
 
     @Test
-    @DisplayName("게시글 전체 조회")
+    @DisplayName("게시글 페이징 전체 조회")
     public void findAllTest() throws Exception {
         // given
         String sort = "id";
@@ -97,6 +97,28 @@ public class BoardControllerUnitTest {
 
         // then
         verify(boardService).findAll(sort, page, member);
+    }
+
+    @Test
+    @DisplayName("게시글 전체 조회 (페이징X)")
+    public void findAllWithoutPagingTest() throws Exception {
+        // given
+        String sort = "id";
+
+        Member member = createUser();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId(), "", Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        given(memberRepository.findByUsername(authentication.getName())).willReturn(Optional.of(member));
+
+
+        // when
+        mockMvc.perform(
+                get("/api/boards/all")
+                        .param("sort", sort)
+        ).andExpect(status().isOk());
+
+        // then
+        verify(boardService).findAllWithoutPaging(sort, member);
     }
 
     @Test
