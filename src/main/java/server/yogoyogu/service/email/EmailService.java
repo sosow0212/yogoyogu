@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import server.yogoyogu.entity.member.EmailAuth;
 import server.yogoyogu.repository.Member.EmailAuthRepository;
 
@@ -88,11 +89,17 @@ public class EmailService {
     // sendSimpleMessage 의 매개변수로 들어온 to 는 곧 이메일 주소가 되고,
     // MimeMessage 객체 안에 내가 전송할 메일의 내용을 담는다.
     // 그리고 bean 으로 등록해둔 javaMail 객체를 사용해서 이메일 send!!
+    @Transactional
     public String sendSimpleMessage(String to) throws Exception {
 
         MimeMessage message = createMessage(to);
 
         try {// 예외처리
+            if(emailAuthRepository.existsByEmail(to)) {
+                // 중첩 인증키는 삭제 후 재전송
+                emailAuthRepository.deleteByEmail(to);
+            }
+
             emailSender.send(message); // 메일 발송
         } catch (MailException es) {
             es.printStackTrace();
