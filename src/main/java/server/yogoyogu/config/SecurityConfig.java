@@ -46,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // CORS
         http.cors().configurationSource(request -> {
             var cors = new CorsConfiguration();
-            cors.setAllowedOrigins(List.of("http://localhost:3000"));
+            cors.setAllowedOrigins(List.of("https://633ec6989ec820004a30086c--cheery-kheer-fe145b.netlify.app/"));
             cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
             cors.setAllowedHeaders(List.of("*"));
             return cors;
@@ -73,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
 
-                .antMatchers("/swagger-ui/**", "/v3/**", "/test").permitAll() // swagger
+                .antMatchers("/swagger-ui/**", "/v3/**", "/test", "/", "/test").permitAll() // swagger
                 .antMatchers(HttpMethod.GET, "/image/**").permitAll() // images
                 .antMatchers("/api/sign-up", "/api/sign-in", "/api/reissue", "/api/sign-up/email", "/api/sign-up/email/check").permitAll() // auth
 
