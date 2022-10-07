@@ -19,9 +19,50 @@
 - JPA
 - JUnit5 Test
 - MySQL
-- Docker
+- Docker, Docker-compose
 - AWS (EC2, Load Balancer, Route 53)
 
+### Project info
+- Java11
+- Gradle
+- Jar
+- Spring Boot 2.7.3
+
+
+
+### Dockerfile
+```dockerfile
+FROM openjdk:11
+ARG JAR_FILE=*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+```
+
+### docker-compose.yml
+```yml
+version: '3.8'
+services:
+  mysqldb:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: yogoyogu
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+
+  backend:
+    build: .
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/yogoyogu
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysqldb
+```
 
 <hr>
 
@@ -55,17 +96,12 @@
 # 3. JUnit5 Test
 
 Controller & Service unit test
+
 <img width="650" alt="image" src="https://user-images.githubusercontent.com/63213487/192087138-26971e6c-c879-412a-9709-078f3e686dd0.png">
 
-
-# 4. version
-- Java11
-- Gradle
-- Jar
-- Spring Boot 2.7.3
 ---
 
-# 5. Convention
+# 4. Convention
 | **Git Convention** |
 ```text
 Git Convention
