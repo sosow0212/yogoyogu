@@ -2,7 +2,7 @@
 # 1. Project
 - <strong>Project name</strong> : 요고요구
 - <strong>Develop Period</strong> : 2022.09 ~ 2022.10
-- 배포 주소 : https://633ec6989ec820004a30086c--cheery-kheer-fe145b.netlify.app/
+- 배포 주소 : https://main--chimerical-malabi-ffde60.netlify.app/
 
 ---
 
