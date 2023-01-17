@@ -96,8 +96,6 @@ public class SignServiceUnitTest {
         assertThatThrownBy(() -> signService.signIn(new LoginRequestDto("username", "password")))
                 .isInstanceOf(PasswordNotFoundException.class);
     }
-
-
 }
 
 
